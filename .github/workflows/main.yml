@@ -22,6 +22,9 @@ jobs:
       contents: read
       attestations: write
       id-token: write
+    env:
+      GHCR_PATH_LOWER: ${{ lower(github.repository) }}
+      DOCKER_IMAGE_PATH: fulydiorito/monapp
     steps:
       - name: Check out the repo
         uses: actions/checkout@v5
@@ -44,8 +47,8 @@ jobs:
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: |
-            fulydiorito/monapp
-            ghcr.io/${{ lower(github.repository) }}
+            ${{ env.DOCKER_IMAGE_PATH }}
+            ghcr.io/${{ env.GHCR_PATH_LOWER }}
 
       - name: Build and push Docker images
         id: push
@@ -59,6 +62,6 @@ jobs:
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v3
         with:
-          subject-name: ghcr.io/${{ lower(github.repository) }}
+          subject-name: ghcr.io/${{ env.GHCR_PATH_LOWER }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
