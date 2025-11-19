@@ -1,4 +1,4 @@
-# Utilise une image Python officielle comme base
+# Utilise une image Python officiele comme base
 FROM python:3.11-slim
 
 # Définit le répertoire de travail dans le conteneur
@@ -15,4 +15,5 @@ FROM python:3.11-slim
 WORKDIR /app
 COPY app.py requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+
 CMD ["python", "app.py"]
