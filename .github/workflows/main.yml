@@ -22,7 +22,7 @@ jobs:
       contents: read
       attestations: write
       id-token: write
-      
+
     steps:
       - name: Check out the repo
         uses: actions/checkout@v5
@@ -48,6 +48,13 @@ jobs:
             fulydiorito/monapp
             ghcr.io/${{ github.repository }}
 
+      - name: Lowercase repository
+        id: lower
+        run: |
+          # Ensure repository string is lowercase for image name (portable using tr)
+          repo=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+          echo "repo=$repo" >> "$GITHUB_OUTPUT"
+
       - name: Build and push Docker images
         id: push
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
@@ -56,10 +63,10 @@ jobs:
           push: true
           tags: |
             fulydiorito/monapp:${{ github.sha }}
-            ghcr.io/${{ toLower(github.repository) }}:${{ github.sha }}
-            ghcr.io/${{ toLower(github.repository) }}:latest
+            ghcr.io/${{ steps.lower.outputs.repo }}:${{ github.sha }}
+            ghcr.io/${{ steps.lower.outputs.repo }}:latest
           labels: ${{ steps.meta.outputs.labels }}
-          
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
@@ -69,5 +76,3 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-          
-      
